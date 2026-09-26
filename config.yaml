@@ -1,0 +1,202 @@
+# ============================================================
+# Configuración del agregador de licitaciones de defensa
+# ------------------------------------------------------------
+# Este es el ÚNICO fichero que necesitas tocar para:
+#   1) añadir/quitar capacidades de tu empresa
+#   2) ajustar el país/idioma objetivo
+#   3) activar/desactivar o ampliar fuentes de datos
+# No hace falta modificar ningún .py para estos cambios.
+# ============================================================
+
+empresa:
+  nombre: "Mi Empresa S.L."
+  pais_objetivo: "ESP"       # código ISO3 usado por la API de TED (ESP = España)
+  idioma_preferente: "es"
+
+# --------------------------------------------------------------
+# CAPACIDADES
+# --------------------------------------------------------------
+# Cada capacidad = un bloque con:
+#   etiqueta          -> nombre legible, aparece en el feed
+#   palabras_clave     -> términos (ES/EN) usados para decidir si una
+#                         licitación es relevante (búsqueda de texto,
+#                         sin distinguir mayúsculas ni acentos)
+#   cpv_orientativos   -> códigos CPV (Common Procurement Vocabulary)
+#                         usados como PRE-FILTRO en TED, opcional.
+#                         Revísalos/ajústalos en https://ted.europa.eu/en/simap/cpv
+#                         El filtrado fino real lo hacen las palabras_clave.
+#
+# Añade tantas capacidades (o palabras clave dentro de cada una) como
+# quieras: basta con seguir el mismo patrón.
+# --------------------------------------------------------------
+capacidades:
+
+  cloud_edge:
+    etiqueta: "Cloud / Edge Computing"
+    palabras_clave:
+      - "cloud computing"
+      - "computación en la nube"
+      - "computacion en la nube"
+      - "edge computing"
+      - "computación en el borde"
+      - "computacion en el borde"
+      - "procesamiento en el borde"
+      - "fog computing"
+      - "infraestructura en la nube"
+    cpv_orientativos:
+      - "72000000"   # Servicios TI: consultoría, desarrollo de software, internet
+      - "48000000"   # Paquetes de software y sistemas de información
+
+  vehiculos_blindados:
+    etiqueta: "Procesamiento de datos en vehículos blindados"
+    palabras_clave:
+      - "vehículo blindado"
+      - "vehiculo blindado"
+      - "vehículos blindados"
+      - "vetrónica"
+      - "vetronica"
+      - "vetronics"
+      - "sistemas embarcados"
+      - "carro de combate"
+      - "vehículo de combate"
+      - "vehiculo de combate"
+    cpv_orientativos:
+      - "35000000"   # Equipo de seguridad, extinción de incendios, policial y de defensa
+      # NOTA: no existe un código CPV específico y estable para "vetrónica";
+      # el filtrado real depende sobre todo de las palabras_clave de arriba.
+
+  uas_uav:
+    etiqueta: "UAS / UAV / Drones"
+    palabras_clave:
+      - "UAV"
+      - "UAS"
+      - "dron"
+      - "drones"
+      - "aeronave no tripulada"
+      - "aeronaves no tripuladas"
+      - "sistema aéreo no tripulado"
+      - "sistema aereo no tripulado"
+      - "vehículo aéreo no tripulado"
+      - "vehiculo aereo no tripulado"
+    cpv_orientativos:
+      - "35000000"
+      - "34711000"   # Aeronaves (revisar alcance exacto en el buscador CPV)
+
+  ciberseguridad:
+    etiqueta: "Ciberseguridad"
+    palabras_clave:
+      - "ciberseguridad"
+      - "ciberdefensa"
+      - "cyber security"
+      - "cybersecurity"
+      - "seguridad de la información"
+      - "seguridad de la informacion"
+      - "SOC"
+      - "ciberataque"
+      - "ciberresiliencia"
+    cpv_orientativos:
+      - "72500000"   # Revisar/ajustar: servicios informáticos relacionados con seguridad
+      - "35000000"
+
+# --------------------------------------------------------------
+# FUENTES
+# --------------------------------------------------------------
+# activo: true/false para encender o apagar cada fuente
+# --------------------------------------------------------------
+fuentes:
+
+  placsp:
+    activo: true
+    descripcion: "Licitaciones públicas de España (Atom oficial, actualización diaria)"
+    url_atom: "https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom"
+
+  ted:
+    activo: true
+    descripcion: "TED - licitaciones de la UE por encima de umbral"
+    endpoint: "https://api.ted.europa.eu/v3/notices/search"
+    paises:
+      - "ESP"          # añade más códigos ISO3 si quieres ampliar a otros países UE
+    dias_hacia_atras: 3   # ventana de publicación consultada cada ejecución
+    limite_resultados: 100
+
+  # Fuentes NO automatizables por RSS/API pública (requieren registro/relación
+  # comercial). Se dejan documentadas aquí para que no se pierdan de vista,
+  # aunque el agregador no las consulta automáticamente:
+  nspa_nato:
+    activo: false
+    descripcion: >
+      NATO Support and Procurement Agency. Requiere registro previo en su
+      "Source File" (https://www.nspa.nato.int/business/procurement/vendor)
+      para acceder a Future Business Opportunities y RFPs vía eProcurement.
+      No ofrece feed RSS público.
+
+  tedae_b2b:
+    activo: false
+    descripcion: >
+      TEDAE (asociación española de defensa/aeroespacial): boletines y
+      encuentros B2B con empresas tractoras (tier 1). No es automatizable,
+      revisar manualmente https://tedae.org
+
+# --------------------------------------------------------------
+# FILTRADO
+# --------------------------------------------------------------
+# Ajustes del motor de coincidencia entre las palabras clave y el texto
+# de cada licitación.
+# --------------------------------------------------------------
+filtrado:
+  # Palabras clave de longitud <= a este valor (acrónimos cortos como
+  # "UAS", "SOC", "UAV") solo coinciden como PALABRA COMPLETA (límites
+  # de palabra), no como subcadena, para evitar falsos positivos
+  # ("UAS" dentro de "aguas", "SOC" dentro de "sociedad").
+  #   - Ponlo a 0 si quieres que TODAS las palabras clave coincidan por
+  #     subcadena (comportamiento antiguo, más ruido).
+  #   - Súbelo si quieres que más palabras cortas exijan coincidencia
+  #     exacta de palabra.
+  longitud_max_acronimo: 4
+
+  # Importe máximo (EUR) de las licitaciones que interesan. Se usa para
+  # acercar el feed a oportunidades accesibles para PYME (tier-2): se
+  # descartan los items cuyo importe supere este umbral.
+  #   - Solo afecta a fuentes que traen el importe (PLACSP). TED no
+  #     expone el valor en su API de búsqueda, así que sus items se
+  #     conservan siempre.
+  #   - Déjalo vacío o quítalo para no filtrar por importe.
+  importe_maximo: 100000
+
+# --------------------------------------------------------------
+# EMAIL (opcional)
+# --------------------------------------------------------------
+# Envío diario de novedades por SMTP, sin API de terceros (gratis).
+# Lo usa scripts/enviar_novedades.py; si este bloque no existe, el script
+# lee las variables de entorno SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
+# MAIL_FROM y MAIL_TO (útil en GitHub Actions con secrets o en un cron
+# del VPS). Ejemplo con Gmail (contraseña de aplicación):
+#   smtp:
+#     host: smtp.gmail.com
+#     puerto: 587
+#     usuario: tu.correo@gmail.com
+#     password: <contraseña de aplicación>
+#     desde: tu.correo@gmail.com
+#     para:
+#       - tu.correo@gmail.com
+#
+# El estado de lo ya enviado se guarda en output/vistos.json (versionado),
+# así cada mañana solo llegan las novedades, sin repetir.
+#
+# email:
+#   smtp:
+#     host: smtp.gmail.com
+#     puerto: 587
+#     usuario: tu.correo@gmail.com
+#     password: TU_CONTRASENA_APP
+#     desde: tu.correo@gmail.com
+#     para:
+#       - tu.correo@gmail.com
+
+# --------------------------------------------------------------
+# SALIDA
+# --------------------------------------------------------------
+salida:
+  titulo_feed: "Licitaciones de Defensa - Radar PYME"
+  fichero: "output/licitaciones_defensa.xml"
+  max_items: 60

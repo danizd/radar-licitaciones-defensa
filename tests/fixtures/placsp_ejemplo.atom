@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Licitaciones PLACSP (ejemplo de prueba)</title>
+  <id>https://contrataciondelsectorpublico.gob.es/sindicacion/ejemplo</id>
+  <updated>2026-08-01T06:00:00+02:00</updated>
+
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/111111</id>
+    <title>Servicio de infraestructura cloud y procesamiento en el borde para plataformas de mando</title>
+    <summary type="text">Id licitación: 4270012026100; Órgano de Contratación: Dirección General de Armamento y Material; Importe: 850000.00 EUR; Estado: EN PLAZO</summary>
+    <link href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=EJEMPLO1"/>
+    <updated>2026-07-31T10:15:00+02:00</updated>
+  </entry>
+
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/222222</id>
+    <title>Suministro de mobiliario de oficina para dependencias administrativas</title>
+    <summary type="text">Id licitación: 4270012026200; Órgano de Contratación: Ayuntamiento de Ejemplo; Importe: 15000.00 EUR; Estado: EN PLAZO</summary>
+    <link href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=EJEMPLO2"/>
+    <updated>2026-07-31T09:00:00+02:00</updated>
+  </entry>
+
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/333333</id>
+    <title>Adquisición de sistema aéreo no tripulado (UAS) de vigilancia para vehículos blindados</title>
+    <summary type="text">Id licitación: 4270012026300; Órgano de Contratación: Base Aérea de Getafe; Importe: 1200000.00 EUR; Estado: EN PLAZO</summary>
+    <link href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=EJEMPLO3"/>
+    <updated>2026-07-31T08:30:00+02:00</updated>
+  </entry>
+</feed>

@@ -1,0 +1,29 @@
+{
+  "notices": [
+    {
+      "publication-number": "477851-2026",
+      "notice-title": {
+        "hun": "Spanyolország – Kiberbiztonsági szolgáltatások – Cybersecurity and SOC services for critical defence infrastructure",
+        "eng": "Spain – Cybersecurity and SOC services for critical defence infrastructure",
+        "spa": "España – Servicios de ciberseguridad y SOC para infraestructuras críticas de defensa"
+      },
+      "buyer-name": {"spa": ["Ministerio de Defensa"]},
+      "buyer-country": "ESP",
+      "classification-cpv": ["72500000"],
+      "deadline": "2026-09-15",
+      "publication-date": "2026-07-30"
+    },
+    {
+      "publication-number": "477900-2026",
+      "notice-title": {
+        "eng": "Spain – Office stationery supply for regional offices",
+        "spa": "España – Suministro de material de papelería para oficinas regionales"
+      },
+      "buyer-name": {"spa": ["Diputación de Ejemplo"]},
+      "buyer-country": "ESP",
+      "classification-cpv": ["30190000"],
+      "deadline": "2026-09-01",
+      "publication-date": "2026-07-30"
+    }
+  ]
+}

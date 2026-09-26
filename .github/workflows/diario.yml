@@ -1,0 +1,47 @@
+name: Radar diario de licitaciones
+
+on:
+  schedule:
+    - cron: "0 7 * * *"        # 07:00 UTC
+  workflow_dispatch: {}        # permite ejecutarlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write              # para poder commitear el feed y el estado de novedades
+
+jobs:
+  generar-y-enviar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Generar feed
+        run: python aggregator.py
+
+      # Si el SMTP falla (secrets sin configurar, red, ...), se registra el
+      # error pero NO se bloquea la publicación del feed: el commit del paso
+      # siguiente se ejecuta igualmente.
+      - name: Enviar novedades por email
+        continue-on-error: true
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python scripts/enviar_novedades.py
+
+      - name: Versionar feed y estado
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@example.com"
+          git add output/licitaciones_defensa.xml output/vistos.json 2>/dev/null || true
+          git commit -m "Actualiza feed y novedades" || echo "sin cambios"
+          git push
