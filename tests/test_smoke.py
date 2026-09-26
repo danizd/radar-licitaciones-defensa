@@ -103,6 +103,47 @@ def test_umbral_acronimo_configurable():
     print("OK: umbral de acrónimo configurable (config.yaml -> filtrado)")
 
 
+def test_palabras_obligatorias_and():
+    """
+    `palabras_obligatorias` añade una condición AND: la capacidad solo
+    coincide si casa AL MENOS UNA palabra_clave Y además AL MENOS UNA
+    obligatoria. Sirve para acotar términos ruidosos ("streaming",
+    "vídeo") a un contexto concreto ("dron", "UAV"...).
+    """
+    capacidades = {
+        "video_uas": {
+            "palabras_clave": ["streaming", "vídeo en directo"],
+            "palabras_obligatorias": ["dron", "UAV", "UAS"],
+        },
+        "ciberseguridad": {"palabras_clave": ["SOC"]},
+    }
+    indice = construir_indice_palabras(capacidades)
+
+    # Ruido descartado: hay palabra_clave pero falta la obligatoria
+    assert capacidades_coincidentes(
+        "Transmisión en streaming de plenos del ayuntamiento", indice
+    ) == []
+    assert capacidades_coincidentes(
+        "Evento con vídeo en directo de la fiesta patronal", indice
+    ) == []
+
+    # Coincidencia real: palabra_clave + obligatoria
+    assert capacidades_coincidentes(
+        "Dron con streaming en directo para vigilancia", indice
+    ) == ["video_uas"]
+    assert capacidades_coincidentes(
+        "Suministro de UAV con vídeo en directo", indice
+    ) == ["video_uas"]
+
+    # La obligatoria también respeta acrónimos como palabra completa:
+    # "streaming" casa, pero "UAS" solo está dentro de "aguas" -> sin match
+    assert capacidades_coincidentes("Streaming de aguas residuales", indice) == []
+
+    # Capacidades sin obligatorias siguen con el comportamiento OR de siempre
+    assert capacidades_coincidentes("Servicio SOC 24x7", indice) == ["ciberseguridad"]
+    print("OK: palabras_obligatorias (condición AND por capacidad)")
+
+
 def test_placsp_parsing():
     ruta = os.path.join(RUTA_FIXTURES, "placsp_ejemplo.atom")
     with open(ruta, "rb") as f:
@@ -261,6 +302,7 @@ if __name__ == "__main__":
     test_matcher_basico()
     test_acronimos_solo_palabra_completa()
     test_umbral_acronimo_configurable()
+    test_palabras_obligatorias_and()
     test_placsp_parsing()
     test_ted_normalizacion()
     test_ted_prefiere_espanol()

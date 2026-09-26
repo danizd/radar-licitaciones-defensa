@@ -25,6 +25,12 @@ empresa:
 #                         usados como PRE-FILTRO en TED, opcional.
 #                         Revísalos/ajústalos en https://ted.europa.eu/en/simap/cpv
 #                         El filtrado fino real lo hacen las palabras_clave.
+#   palabras_obligatorias -> OPCIONAL. Si se define, además de casar una
+#                         palabra_clave debe casar AL MENOS UNA de esta
+#                         lista (condición AND). Útil para acotar términos
+#                         ruidosos ("streaming", "vídeo") a un contexto
+#                         concreto ("dron", "UAV"...). Aplica la misma
+#                         regla de acrónimos que las palabras_clave.
 #
 # Añade tantas capacidades (o palabras clave dentro de cada una) como
 # quieras: basta con seguir el mismo patrón.
@@ -97,6 +103,92 @@ capacidades:
     cpv_orientativos:
       - "72500000"   # Revisar/ajustar: servicios informáticos relacionados con seguridad
       - "35000000"
+
+  atak:
+    etiqueta: "ATAK / TAK (concienciación táctica)"
+    palabras_clave:
+      - "ATAK"
+      - "CivTAK"
+      - "WinTAK"
+      - "iTAK"
+      - "Android Team Awareness Kit"
+      - "Team Awareness Kit"
+    cpv_orientativos:
+      - "35000000"   # equipo de defensa
+      - "72000000"   # servicios TI
+      - "48000000"   # software
+
+  gis_sig:
+    etiqueta: "GIS / SIG (cartografía y sistemas geográficos)"
+    palabras_clave:
+      - "GIS"
+      - "SIG"
+      - "sistema de información geográfica"
+      - "sistema de informacion geografica"
+      - "cartografía"
+      - "cartografia"
+      - "cartográfico"
+      - "cartografico"
+      - "cartográfica"
+      - "cartografica"
+      - "georreferenciación"
+      - "georreferenciacion"
+      - "QGIS"
+      - "ArcGIS"
+      - "modelo digital del terreno"
+      - "ortofoto"
+      - "ortofotografía"
+      - "ortofotografia"
+      - "fotogrametría"
+      - "fotogrametria"
+    cpv_orientativos:
+      - "48000000"   # software / sistemas de información
+      - "72000000"   # servicios TI
+      - "71354000"   # servicios de elaboración de mapas
+      - "71355000"   # servicios de levantamiento topográfico
+      - "71355100"   # servicios de fotogrametría
+
+  video_uas:
+    etiqueta: "Streaming de vídeo desde UAS"
+    # Términos de vídeo (ruidosos por sí solos) + condición AND con
+    # palabras_obligatorias: solo cuenta si el texto también menciona
+    # drones/UAS.
+    palabras_clave:
+      - "vídeo en directo"
+      - "video en directo"
+      - "vídeo en tiempo real"
+      - "video en tiempo real"
+      - "streaming"
+      - "transmisión de vídeo"
+      - "transmision de video"
+      - "retransmisión de vídeo"
+      - "retransmision de video"
+      - "cámara en vuelo"
+      - "camara en vuelo"
+      - "imagen aérea en tiempo real"
+      - "imagen aerea en tiempo real"
+      - "live video"
+      - "real-time video"
+      - "video feed"
+      - "downlink"
+      - "EO/IR"
+      - "gimbal"
+    palabras_obligatorias:
+      - "dron"
+      - "drones"
+      - "UAV"
+      - "UAS"
+      - "RPAS"
+      - "aeronave no tripulada"
+      - "aeronaves no tripuladas"
+      - "sistema aéreo no tripulado"
+      - "sistema aereo no tripulado"
+      - "vehículo aéreo no tripulado"
+      - "vehiculo aereo no tripulado"
+    cpv_orientativos:
+      - "35000000"   # equipo de defensa
+      - "34711000"   # aeronaves
+      - "32333000"   # equipo de grabación/reproducción de vídeo
 
 # --------------------------------------------------------------
 # FUENTES

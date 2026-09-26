@@ -93,6 +93,11 @@ ningún `.py`. Cada capacidad es un bloque con:
   al consultar TED (no afectan a PLACSP). El filtrado fino real lo hacen
   las `palabras_clave`. Puedes buscar/verificar códigos en
   https://ted.europa.eu/en/simap/cpv
+- `palabras_obligatorias` (opcional): si la defines, además de casar una
+  `palabra_clave` debe casar al menos una de esta lista (condición AND).
+  Ideal para acotar términos ruidosos: p. ej. en `video_uas` se combina
+  "streaming" / "vídeo en directo" con "dron"/"UAV", de modo que solo
+  cuentan los vídeos que realmente vienen de un UAS.
 
 Ejemplo de cómo añadir una capacidad nueva (p. ej. comunicaciones tácticas):
 
