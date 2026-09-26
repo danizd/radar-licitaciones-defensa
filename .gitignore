@@ -4,7 +4,6 @@ __pycache__/
 *.pyo
 .env
 .venv
-output/vistos.json
 
 output/test_smoke.xml
 Radar_licitaciones_defensa.zip
