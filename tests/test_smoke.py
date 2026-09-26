@@ -158,9 +158,12 @@ def test_novedades_email():
     assert len(nuevos) == len(items) - 1
     assert items[0]["id"] not in {n["id"] for n in nuevos}
 
-    # El email construido contiene los títulos de las novedades
+    # El email construido contiene los títulos de las novedades (texto y HTML)
     msg = novedades.construir_email(items[:1])
-    assert items[0]["titulo"] in msg.get_content()
+    texto = msg.get_body(preferencelist=("plain",)).get_content()
+    html = msg.get_body(preferencelist=("html",)).get_content()
+    assert items[0]["titulo"] in texto
+    assert items[0]["titulo"] in html
     print("OK: novedades por email solo con items no enviados")
 
 
