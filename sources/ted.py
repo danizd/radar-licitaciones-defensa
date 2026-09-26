@@ -97,7 +97,10 @@ def _valor_multilingue(campo, idioma_preferente: str = "es") -> str:
 
 def obtener_licitaciones(config_fuente: dict, cpv_codes: list[str]) -> list[dict]:
     """
-    Consulta la API de búsqueda de TED.
+    Consulta la API de búsqueda de TED (con paginación automática).
+
+    Si limite_resultados > 100, pagina con iterationNextToken hasta cubrir
+    el límite o agotar resultados (la API devuelve máx. ~100 por página).
 
     Devuelve una lista de dicts normalizados:
         {id, titulo, resumen, enlace, actualizado, fuente}
@@ -107,26 +110,50 @@ def obtener_licitaciones(config_fuente: dict, cpv_codes: list[str]) -> list[dict
     endpoint = config_fuente.get("endpoint", ENDPOINT_POR_DEFECTO)
     paises = config_fuente.get("paises", [])
     dias = config_fuente.get("dias_hacia_atras", 3)
-    limite = config_fuente.get("limite_resultados", 100)
+    limite_total = config_fuente.get("limite_resultados", 100)
 
     query = _construir_query(paises, dias, cpv_codes)
-    payload = {
-        "query": query,
-        "fields": CAMPOS,
-        "limit": limite,
-        "scope": "ACTIVE",
-        "paginationMode": "ITERATION",
-    }
 
-    try:
-        respuesta = requests.post(endpoint, json=payload, timeout=TIMEOUT_SEGUNDOS)
-        respuesta.raise_for_status()
-        datos = respuesta.json()
-    except (requests.RequestException, ValueError) as exc:
-        logger.warning("TED: no se pudo consultar la API (%s)", exc)
-        return []
+    todas: list[dict] = []
+    token: str | None = None
 
-    return _normalizar_respuesta(datos)
+    while len(todas) < limite_total:
+        restantes = limite_total - len(todas)
+        # La API limita cada página a ~100; pedimos como mucho lo que falta.
+        limite_pagina = min(restantes, 100)
+        payload: dict = {
+            "query": query,
+            "fields": CAMPOS,
+            "limit": limite_pagina,
+            "scope": "ACTIVE",
+            "paginationMode": "ITERATION",
+        }
+        if token:
+            payload["iterationNextToken"] = token
+
+        try:
+            respuesta = requests.post(endpoint, json=payload, timeout=TIMEOUT_SEGUNDOS)
+            respuesta.raise_for_status()
+            datos = respuesta.json()
+        except (requests.RequestException, ValueError) as exc:
+            logger.warning("TED: no se pudo consultar la API (%s)", exc)
+            # Si ya tenemos algo, devolvemos lo conseguido; si no, lista vacía.
+            return _normalizar_respuesta({"notices": todas}) if todas else []
+
+        anuncios = datos.get("notices") or datos.get("results") or []
+        if not anuncios:
+            break
+        todas.extend(anuncios)
+
+        token = datos.get("iterationNextToken")
+        total = datos.get("totalNoticeCount")
+        if not token or (total is not None and len(todas) >= total):
+            break
+        if len(anuncios) < limite_pagina:
+            break
+
+    # Normalizamos a través del mismo helper (esperando clave "notices").
+    return _normalizar_respuesta({"notices": todas})
 
 
 def _normalizar_respuesta(datos: dict) -> list[dict]:
