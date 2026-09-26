@@ -1,0 +1,45 @@
+name: Radar 30 días (histórico)
+
+on:
+  workflow_dispatch: {}  # solo manual, para búsquedas históricas puntuales
+
+permissions:
+  contents: write
+
+jobs:
+  historico:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Generar config histórica (30 días)
+        run: python scripts/gen_config_30d.py --dias 30 --limite 800
+
+      - name: Generar feed histórico
+        run: python aggregator.py --config config_30d.yaml
+
+      - name: Enviar informe 30 días por email (diseño nuevo, todo el histórico)
+        continue-on-error: true
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python scripts/enviar_novedades.py --feed output/licitaciones_defensa_30d.xml --todos
+
+      - name: Versionar feed histórico
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@example.com"
+          git add output/licitaciones_defensa_30d.xml 2>/dev/null || true
+          git commit -m "Informe 30 dias" || echo "sin cambios"
+          git push

@@ -7,3 +7,5 @@ __pycache__/
 
 output/test_smoke.xml
 Radar_licitaciones_defensa.zip
+config_30d.yaml
+config_ultimo_mes.yaml
