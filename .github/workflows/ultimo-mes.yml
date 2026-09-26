@@ -40,6 +40,6 @@ jobs:
         run: |
           git config user.name "bot"
           git config user.email "bot@example.com"
-          git add output/licitaciones_defensa_30d.xml 2>/dev/null || true
-          git commit -m "Informe 30 dias" || echo "sin cambios"
+          git add output/licitaciones_defensa_30d.xml output/vistos.json 2>/dev/null || true
+          git commit -m "Informe 30 dias + estado de vistos" || echo "sin cambios"
           git push
